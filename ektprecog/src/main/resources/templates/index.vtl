@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Theme Made By www.w3schools.com - No Copyright -->
+  <title>Program Skripsi "E-KTP Recognition"</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://pixlcore.com/demos/webcamjs/webcam.min.js"></script>
+  <style>
+  body {
+      font: 20px Montserrat, sans-serif;
+      line-height: 1.8;
+      color: #f5f6f7;
+  }
+  p {font-size: 16px;}
+  .margin {margin-bottom: 45px;}
+  .bg-1 { 
+      background-color: #1abc9c;
+      color: #ffffff;
+  }
+  .bg-2 { 
+      background-color: #474e5d;
+      color: #ffffff;
+  }
+  .bg-3 { 
+      background-color: #ffffff; 
+      color: #555555;
+  }
+  .bg-4 { 
+      background-color: #2f2f2f;
+      color: #fff;
+  }
+  .container-fluid {
+      padding-top: 70px;
+      padding-bottom: 70px;
+  }
+  .navbar {
+      padding-top: 15px;
+      padding-bottom: 15px;
+      border: 0;
+      border-radius: 0;
+      margin-bottom: 0;
+      font-size: 12px;
+      letter-spacing: 5px;
+  }
+  .navbar-nav  li a:hover {
+      color: #1abc9c !important;
+  }
+  
+  form { margin-top: 15px; }
+  form > input { margin-right: 15px; }
+  #results { float:right; margin:20px; padding:20px; border:1px solid; background:#ccc; }
+  </style>
+</head>
+<body data-spy="scroll">
+
+<!-- Navbar -->
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <span class="navbar-brand">E-KTP Recognition</span>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="train">TRAINING</a></li>
+        <li><a id="linkabout" href="#">ABOUT</a></li>
+        <li><a id="linkhelp" href="#">HELP</a></li>
+        <li><a href="#cont1">SNAPSHOT!</a></li>
+        <li><a href="#cont2">PROCESS HERE!</a></li>
+        <li><a href="#cont3">RESULTS</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- First Container -->
+<div id="cont1" class="container-fluid bg-1 text-center">
+  <h3 class="margin row">Take A Snapshot!</h3>
+  <div class="margin center-block" id="my_camera"></div>
+  <hr style="border:1px solid #ff0000; position: absolute; top:204px; left: 321px; width: 700px;">
+  <div style="font-size:15px; color: black; position: absolute; top:220px; left: 760px;">Penempatan <b>NIK</b> dibawah garis ini</div>
+  <div style="width:705px;height:405px;border:4px dashed #e7e7e7; position: absolute; top:158px; left: 319px;"></div>
+  <form action="#cont2" style="margin-left: 30%; margin-right: 30%">
+		<input id="snapshot" style="color:black" href="#cont2" type="button" value="Take Snapshot" onClick="take_snapshot();" >
+    <br>
+    <span style="margin-right: 25px"> OR </span>
+    <br>
+    <input id="inputImgKtp" type="file" class="filestyle" data-iconName="glyphicon glyphicon-picture"  accept="image/*" data-size="lg">
+	</form>
+</div>
+
+<!-- Second Container -->
+<div id="cont2" class="container-fluid bg-2 text-center">
+	<canvas id="results" width="700" height="400" style="padding:0; float:none; margin-left: auto; border: 2px solid #000000; background-color:white"></canvas>
+	<form id="formProcess">
+		<a href="#" id="download" onClick="downloadCanvas()">Download as image</a>
+	</form>
+	<button class="btn btn-default" id="btnSubmit2">Process to Recognition</button>
+</div>
+
+<!-- Third Container (Grid) -->
+<div id="cont3" class="container-fluid bg-3">    
+  <div class="row">
+    <div class="col-md-5" style="margin-left: 6%;">Recognition Result Using Characters From E-KTP</div>
+    <div class="col-md-5" style="margin-left: 5%;">Recognition Result Using Characters From Ms. Word</div>
+  </div>
+  <div class="row">
+    <div class="well col-md-5" id="hasilRecog0" style="margin-left: 6%;"></div>
+    <div class="well col-md-5" id="hasilRecog1" style="margin-left: 5%;"></div>
+  </div>
+</div>
+
+<div id="ModalAbout" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h2 class="modal-title" style="color:#000">About</h2>
+            </div>
+            <div class="modal-body" style="color:#000; text-align: justify;">
+                <p>Program <b>E-KTP Text Information Recognition</b> adalah program yang menerima input citra e-KTP, khususnya informasi teks, kemudian mengubah informasi tersebut ke dalam bentuk digital. Cara kerjanya menggunakan prinsip OCR dengan menggunakan dua metode utama, yaitu Connected Component Labeling untuk pemotongan karakter dan Crossings untuk ekstraksi ciri karakter. Program ini bertujuan untuk mempermudah penginputan informasi dalam e-KTP secara otomatis.</p>
+                <hr>
+                <p>Program dibuat oleh <b>Owen Kalyanda (535140003)</b> dengan bimbingan Ibu <b>Lina S.T., M.Kom., Ph.D.</b> sebagai
+                  pembimbing 1 dan Bapak <b>Agus Budi Dharmawan S.Kom, M.T., M.Sc.</b> sebagai pembimbing 2, sebagai syarat kelulusan skripsi.
+                </p>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="ModalHelp" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h2 class="modal-title" style="color:#000">Help</h2>
+            </div>
+            <div class="modal-body" style="color:#000; text-align: justify;">
+                <p>Selamat datang di modul bantuan untuk modul pengenalan</p>
+                <p>Modul pengenalan dibagi menjadi 3 section. Section input, section proses dan section hasil.</p>
+                <hr>
+                <p>Penginputan dapat dilakukan dengan dua cara: input melalui webcam (dianjurkan menggunakan alat perekam e-KTP) atau
+                  melalui upload gambar.
+                </p>
+                <hr>
+                <p>Jika penginputan menggunakan webcam, tekan tombol <b>Snapshot!</b>, sedangkan button <b>Choose file</b> digunakan untuk mengupload gambar. Masing-masing tombol jika ditekan akan mengarahkan anda ke section proses.
+                </p>
+                <hr>
+                <p>Di section proses terdapat tombol <b>Process to Recognition</b> yang akan memproses citra input sehingga program dapat
+                  mendigitalisasi informasi teks pada e-KTP. Tombol tersebut juga akan mengarahkan anda ke section hasil.
+                </p>
+                <hr>
+                <p>Section hasil akan menampilkan hasil dari pemrosesan program. Hasil terbagi menjadi dua berdasarkan dua dataset latih: dari e-KTP asli dan dari font Ms. Word.
+                </p>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="container-fluid bg-4 text-center">
+  <p>A Website for Thesis Requirement</p>
+  <p>By <b>Owen Kalyanda</b></p> 
+</footer>
+
+<script language="JavaScript">
+		Webcam.set({
+			width: 700,
+			height: 400,
+			image_format: 'jpeg',
+			jpeg_quality: 120,
+			constraints: {
+				width: 700,
+				height: 400,
+				facingMode: 'user',
+				frameRate: 60
+			}
+		});
+		Webcam.attach( '#my_camera' );
+	</script>
+	
+	<script language="JavaScript">
+		var canvas = document.getElementById('results');
+		function take_snapshot() {
+      $("#hasilRecog").empty(); 
+			Webcam.snap( function(data_uri) {
+
+				// memasukkan gambar ke canvas	
+
+				context = canvas.getContext('2d');
+				
+				make_base(data_uri);
+				
+				});
+ 
+		};
+		
+		function downloadCanvas() {
+    					document.getElementById('download').href = document.getElementById('results').toDataURL();
+		      			document.getElementById('download').download = "test.jpg";
+		      		};
+		
+ 	function make_base(data)
+				{
+				  base_image = new Image();
+				  base_image.src = data;
+				  base_image.onload = function(){
+			      context.drawImage(base_image, 0, 0);
+				  }
+				 };
+
+	function sendImg(){
+		var canvasServer = document.getElementById("results");
+		var context = canvasServer.getContext("2d");                    
+		var imageDataURL = canvasServer.toDataURL('image/png');
+		var ajax = new XMLHttpRequest();
+		ajax.open("POST",trinityCvaServicesUrl+"common/uploadImage",false);
+		ajax.setRequestHeader("Content-Type", "application/upload");
+		ajax.send(imageDataURL);
+	}
+	</script>
+	
+	<script> 
+ 
+ $("#btnSubmit2").button().click(function(){ 
+    $("#hasilRecog").empty();                   
+    var imageDataURL = document.getElementById('results').toDataURL();
+    var ajax = new XMLHttpRequest();
+    ajax.open("POST","/api/processEktp",false);
+    ajax.setRequestHeader("Content-Type", "application/upload");
+    ajax.send(imageDataURL); 
+    var obj = JSON.parse(ajax.responseText);
+   
+
+    if(obj.ready == "ready"){
+      for (var i = 0; i < obj.info.length; i++) { 
+         var info = "";
+         $("#hasilRecog"+i).empty();
+        for (var j = 0; j < obj.info[i].length; j++) {
+          info += obj.info[i][j]+"<br>";
+        }
+      $("#hasilRecog"+i).append(info);
+      console.log(info);  
+    }
+     
+  }
+
+  if (this.hash !== "") {
+    event.preventDefault();
+    var hash = '#cont3';
+    $('html, body').animate({
+      scrollTop: $(hash).offset().top
+    }, 1500, function(){
+      window.location.href = hash;
+      });
+    }
+      
+
+    });
+ 
+ $(document).ready(function(){
+  $(".navbar a").on('click', function(event) {
+  if (this.hash !== "") {
+    event.preventDefault();
+    var hash = this.hash;
+    $('html, body').animate({
+      scrollTop: $(hash).offset().top
+    }, 900, function(){
+      window.location.hash = hash;
+      });
+    }
+  });
+})
+
+ $(document).ready(function(){
+  $("#snapshot").on('click', function(event) {
+  if (this.hash !== "") {
+    event.preventDefault();
+    var hash = '#cont2';
+    $('html, body').animate({
+      scrollTop: $(hash).offset().top
+    }, 900, function(){
+      window.location.href = hash;
+      });
+    }
+    $('#btnSubmit2').prop('disabled', false);
+  });
+})
+
+$(document).ready(function(){
+  $("#inputImgKtp").on('change', function(event) {
+  if (this.hash !== "") {
+    event.preventDefault();
+    var hash = '#cont2';
+    $('html, body').animate({
+      scrollTop: $(hash).offset().top
+    }, 1500, function(){
+      window.location.href = hash;
+      });
+    }
+  });
+  
+})
+
+
+ window.onload = function() {
+    var input = document.getElementById('inputImgKtp');
+    input.addEventListener('change', function(){
+      $("#hasilRecog").empty(); 
+      var ctx = document.getElementById('results').getContext('2d');
+      var img = new Image;
+      img.onload = function() {
+          ctx.drawImage(img, 0, 0);
+      }
+      img.src = URL.createObjectURL(input.files[0]);
+      $('#btnSubmit2').prop('disabled', false);
+    });
+   
+
+}
+
+$(document).ready(function(){
+     var blank = document.createElement('canvas');
+    blank.width = document.getElementById('results').width;
+    blank.height = document.getElementById('results').height;
+    if(document.getElementById('results').toDataURL() == blank.toDataURL()){
+      $('#btnSubmit2').prop('disabled', true);
+    }
+  });
+
+$("#linkabout").on('click', function() {
+    $("#ModalAbout").modal('show');
+});
+
+$("#linkhelp").on('click', function() {
+    $("#ModalHelp").modal('show');
+});
+	</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-filestyle/1.2.3/bootstrap-filestyle.min.js"> 
+$("#inputImgKtp").filestyle();
+</script>
+
+</body>
+</html>
